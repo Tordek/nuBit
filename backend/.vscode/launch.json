@@ -7,7 +7,7 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "src.main:app",
+                "nubit.main:app",
                 "--reload"
             ],
             "console": "integratedTerminal"

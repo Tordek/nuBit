@@ -7,7 +7,7 @@ export type OauthRequestParams = {
 const VUE_APP_API_URL = process.env['VUE_APP_API_URL']
 
 export default async function (oauthData: OauthRequestParams): Promise<UserDataResponse> {
-    const request = await fetch(`${VUE_APP_API_URL}/api/oauth/discord`, {        
+    const request = await fetch(`${VUE_APP_API_URL}/api/auth/discord`, {        
         credentials: "include",
         method: "POST",
         body: JSON.stringify(oauthData)

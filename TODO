@@ -5,9 +5,11 @@
 [ ] Submit
 [ ] Vote
 [ ] View status for own submissions
-[ ] Make the Discord bot part... exist.
+[x] Make the Discord bot part... exist.
 [ ] Provide an installing script:
     [ ] `nginx.conf` - See Vue's docs: needs to serve static files if found, then `api` from backend, then anything else points to the `vue` root at index.html
-    [ ] `nuBot.service`
+    [ ] `nuBit.service`
     [ ] `npm run build && cp -R build ../backend/`
 [ ] Style
+[ ] Make `status` and `ranking` show links to the website
+[ ] Check if is_admin
