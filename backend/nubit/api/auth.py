@@ -1,38 +1,56 @@
 import os
 from typing import Optional
 import discord
-from fastapi import APIRouter, HTTPException, Depends, Response
-from fastapi_sessions.session_cookie import SessionInfo
+from fastapi import APIRouter, HTTPException, Depends, Response, Request
 from pydantic import BaseModel
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
-from nubit.api.session import SessionData, session
 from nubit import bot
+from nubit.helpers import require_login, session
 
 CLIENT_ID = os.environ["CLIENT_ID"]
 CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 SERVER_ID = os.environ["SERVER_ID"]
 ADMIN_ROLE_ID = os.environ["ADMIN_ROLE_ID"]
+DISCORD_SCOPES = ["identify"]
 
 
 class OauthRequest(BaseModel):
-    authorization_response: str
+    code: str
+    state: str
+    redirectUri: str
 
 
 router = APIRouter()
 
 
-@router.post("/discord")
-async def oauth(request: OauthRequest, response: Response) -> SessionData:
-    scope = ["identify", "guilds"]
-    discord_client = OAuth2Session(client_id=CLIENT_ID, scope=scope,
-                            redirect_uri="http://localhost:8080/oauth/discord/")
+@router.get("/discord")
+async def get_login_url(redirectUri: str, session=Depends(session)):
 
+    discord_client = OAuth2Session(client_id=CLIENT_ID,
+                                   scope=DISCORD_SCOPES,
+                                   redirect_uri=redirectUri)
+
+    authorization_url, state = discord_client.authorization_url(
+        'https://discord.com/api/oauth2/authorize')
+
+    session['state'] = state
+    return {"authUrl": authorization_url}
+
+
+@router.post("/discord")
+async def oauth(oauth: OauthRequest, session=Depends(session)):
+    discord_client = OAuth2Session(client_id=CLIENT_ID,
+                                   scope=DISCORD_SCOPES,
+                                   state=session['state'],
+                                   redirect_uri=oauth.redirectUri)
+    # Verify the token
     try:
-        discord_client.fetch_token(
+        token = discord_client.fetch_token(
             token_url="https://discord.com/api/oauth2/token",
             client_secret=CLIENT_SECRET,
-            code=request.authorization_response
+            code=oauth.code,
+            state=oauth.state
         )
     except OAuth2Error:
         raise HTTPException(status_code=401, detail="Failure obtaining data")
@@ -54,20 +72,27 @@ async def oauth(request: OauthRequest, response: Response) -> SessionData:
 
     is_admin = int(ADMIN_ROLE_ID) in member.roles
 
-    user = SessionData(
-        user_id=user_data["id"],
-        username=member.nickname,
-        avatar=user_data["avatar"],
-        is_admin=is_admin
-    )
-    await session.create_session(user, response)
+    del session['state']
+    session['user_id'] = user_data["id"]
+    session['username'] = member.nick or user_data["username"]
+    session['avatar'] = user_data["avatar"]
+    session['is_admin'] = is_admin
+    session['access_token'] = token["access_token"]
+    session['refresh_token'] = token["refresh_token"]
 
-    return user
+    return {
+        'user_id': session['user_id'],
+        'username': session['username'],
+        'avatar': session['avatar'],
+        'is_admin': session['is_admin'],
+    }
 
 
-@router.get("/me")
-async def me(session_info: Optional[SessionInfo] = Depends(session)) -> SessionData:
-    if session_info is None:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-
-    return session_info[1]
+@router.get("/me", dependencies=[Depends(require_login)])
+async def me(session=Depends(session)):
+    return {
+        'user_id': session['user_id'],
+        'username': session['username'],
+        'avatar': session['avatar'],
+        'is_admin': session['is_admin'],
+    }

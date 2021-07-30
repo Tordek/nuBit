@@ -1,6 +1,6 @@
 export type WeekData = {
-    viewingOpen: boolean;
     votingOpen: boolean;
+    submissionOpen: boolean;
     entries: Entry[];
     voteParams: VoteParam[];
     theme: string;
@@ -18,9 +18,12 @@ export type Entry = {
     entrantName: string;
     entryName: string;
     pdfUrl: string;
+    pdfFormat: string;
     mp3Url: string;
     mp3Format: string;
-} & Record<string, any>;
+    isValid: boolean;
+    entryNotes?: string;
+};
 
 export type AuthenticatedQuery = {
     userstringey: string

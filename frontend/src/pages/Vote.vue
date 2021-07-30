@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import getEntries from "@/services/getEntries";
+import getWeek from "@/services/getWeek";
 import { WeekData } from "@/types";
 import Vue from "vue";
 import VoteListDetailView from "../components/VoteListDetailView.vue";
@@ -30,7 +30,7 @@ export default Vue.extend({
   },
   async mounted() {
     try {
-      this.weekData = await getEntries({});
+      this.weekData = await getWeek({});
 
       this.mode = "vote";
     } catch (e) {

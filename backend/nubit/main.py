@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 import asyncio
 from nubit import bot
 from nubit.api import auth, weeks, entries, votes
@@ -8,6 +9,7 @@ from nubit.api import auth, weeks, entries, votes
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
 
+COOKIE_SECRET = os.environ["COOKIE_SECRET"]
 app = FastAPI()
 
 origins = [
@@ -23,6 +25,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=COOKIE_SECRET
+)
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -30,8 +37,8 @@ async def startup_event():
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth")
-api_router.include_router(weeks.router, prefix="/auth")
-api_router.include_router(entries.router, prefix="/auth")
-api_router.include_router(votes.router, prefix="/auth")
+api_router.include_router(weeks.router, prefix="/weeks")
+api_router.include_router(entries.router, prefix="/entries")
+api_router.include_router(votes.router, prefix="/votes")
 
 app.include_router(api_router, prefix="/api")

@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Layout from '../components/Layout.vue'
 import Home from '../pages/Home.vue'
 import Vote from '../pages/Vote.vue'
+import Submit from '../pages/Submit.vue'
 import OauthDiscord from '../pages/DiscordOauth.vue'
 
 Vue.use(VueRouter)
@@ -24,6 +25,10 @@ const routes: Array<RouteConfig> = [
       {
         path: 'vote',
         component: Vote
+      },
+      {
+        path: 'submit',
+        component: Submit
       },
     ]
   },

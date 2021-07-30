@@ -16,6 +16,7 @@ SERVER_ID = os.environ["SERVER_ID"]
 ADMIN_ROLE_ID = os.environ["ADMIN_ROLE_ID"]
 NOTIFY_ADMINS_CHANNEL = os.environ["NOTIFY_ADMINS_CHANNEL"]
 URL_BASE = os.environ["URL_BASE"]
+TIMEZONE_OFFSET = os.environ["TIMEZONE_OFFSET"]
 
 dm_reminder = "_Ahem._ DM me to use this command."
 client = commands.Bot(description="Musical Voting Platform",
@@ -376,19 +377,19 @@ async def howlong(context: commands.Context) -> None:
 
     result = ""
     if days > 1:
-        result += '{} days, '.format(days)
+        result += f'{days} days, '
     elif days > 0:
-        result += '{} day, '.format(days)
+        result += '1 day, '
 
     if hours > 1:
-        result += '{} hours, '.format(hours)
+        result += f'{hours} hours, '
     elif hours > 0:
-        result += '{} hour, '.format(hours)
+        result += '1 hour, '
 
     if minutes > 1:
-        result += '{} minutes, '.format(minutes)
+        result += f'{minutes} minutes, '
     elif minutes > 0:
-        result += '{} minute, '.format(minutes)
+        result += '1 minute, '
     result += 'until submissions close.'
 
     # a very serious feature

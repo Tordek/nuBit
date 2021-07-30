@@ -14,9 +14,8 @@ frontend.
 Configuration is done through `env` variables or `.env` files.
 
 Frontend settings:
-- `VUE_APP_API_URL=` - The URL the server is served at
-- `VUE_APP_OAUTH_URL=https://discord.com/api/oauth2/authorize...` - The Discord
-    URL the user logs in at. Configure the `redirect_url` for your app.
+- `VUE_APP_APP_URL=` - The URL prefix the client is served at
+- `VUE_APP_API_URL=` - The URL prefix the server is served at
 
 Backend settings:
 - `CLIENT_ID=` - Your Discord App ID
@@ -30,6 +29,7 @@ Backend settings:
 - `NOTIFY_ADMINS_CHANNEL=` - ID for the channel where admin notifications are
     sent
 - `URL_BASE=` - Base URL assets will be served from.
+- `TIMEZONE_OFFSET=` - Timezone delta between the server and the display.
 
 Running
 -------
@@ -45,6 +45,12 @@ Installing
 
 Run `npm run build` on the frontend, copy it to the backend's `static` directory
 and serve.
+
+Implementation details
+----------------------
+- Since Discord uses huge numbers for its ids, and Javascript doesn't play well
+    with them, we store them as strings whenever possible and convert them to
+    `int` whenever interacting with the bot.
 
 License
 -------

@@ -1,6 +1,6 @@
-[ ] Make the OAuth login use `state`
-[ ] With ^, remove VUE_APP_OAUTH_URL and generate it server-side
-[ ] Handle OAuth errors
+[x] Make the OAuth login use `state`
+[x] With ^, remove VUE_APP_OAUTH_URL and generate it server-side
+[x] Handle OAuth errors
 [ ] View submissions - Not logged in
 [ ] Submit
 [ ] Vote

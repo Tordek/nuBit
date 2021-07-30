@@ -1,23 +1,27 @@
 <template>
   <div>
-    <div v-if="user === null" class="buttons">
-      <a class="button is-primary" :href="oauth_url">
-        Log in with Discord
-      </a>
-    </div>
-    <div v-else>
+    <div v-if="user !== null">
       <img
         :src="`https://cdn.discordapp.com/avatars/${user.user_id}/${user.avatar}.png`"
         alt="User Avatar" />
+        {{ user.username }}
+    </div>    
+    <div v-else-if="oauthUrl !== null" class="buttons">
+      <a class="button is-primary" :href="oauthUrl">
+        Log in with Discord
+      </a>
     </div>
+    <progress v-else class="progress" style="width: 100px"/>
   </div>
 </template>
+
 <script lang="ts">
 import Vue from "vue";
 import getUserData, { UserDataResponse } from "@/services/getUserData";
+import getAuthUrl from "@/services/getAuthUrl";
 import { PropType } from "vue/types/options";
 
-const oauth_url = process.env.VUE_APP_OAUTH_URL;
+const APP_URL = process.env["VUE_APP_APP_URL"];
 
 export default Vue.extend({
   props: {    
@@ -25,15 +29,24 @@ export default Vue.extend({
   },
   data() {
     return {
-      oauth_url
+      oauthUrl: null as string | null
     }
   },
   async mounted() {
     try {
       const userData = await getUserData();
       this.$emit('update:user', userData)
-    } catch (e) {
-      // We don't care about login errors
+      return;
+    } catch {
+      // No problem if the user isn't logged in.
+    }
+    
+    // If there was no login, fetch the login URL
+    try {
+      this.oauthUrl = (await getAuthUrl({ redirectUri: `${APP_URL}/oauth/discord` })).authUrl;      
+    } catch {
+      // TODO: Actually display the error
+      // because we can't login now
     }
   }
 });

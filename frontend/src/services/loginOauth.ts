@@ -1,16 +1,21 @@
 import { UserDataResponse } from "./getUserData";
 
 export type OauthRequestParams = {
-    authorization_response: string,
+    code: string,
+    state: string,
+    redirectUri: string,
 };
 
-const VUE_APP_API_URL = process.env['VUE_APP_API_URL']
+const API_URL = process.env['VUE_APP_API_URL']
 
 export default async function (oauthData: OauthRequestParams): Promise<UserDataResponse> {
-    const request = await fetch(`${VUE_APP_API_URL}/api/auth/discord`, {        
+    const request = await fetch(`${API_URL}/api/auth/discord`, {
         credentials: "include",
         method: "POST",
-        body: JSON.stringify(oauthData)
+        body: JSON.stringify(oauthData),
+        headers: {
+            "Content-Type": "application/json"
+        }
     });
 
     if (!request.ok) {
