@@ -5,7 +5,6 @@ from fastapi_sessions.session_cookie import SessionInfo
 from pydantic import BaseModel
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
-from nubit.bot import Bot, is_admin
 from nubit.api.session import SessionData, session
 
 CLIENT_ID = os.environ["CLIENT_ID"]

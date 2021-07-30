@@ -3,7 +3,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 from nubit import bot
-from nubit.api import auth
+from nubit.api import auth, weeks, entries, votes
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
@@ -30,5 +30,8 @@ async def startup_event():
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth")
+api_router.include_router(weeks.router, prefix="/auth")
+api_router.include_router(entries.router, prefix="/auth")
+api_router.include_router(votes.router, prefix="/auth")
 
-app.add_api_route(api_router, prefix="/api")
+app.include_router(api_router, prefix="/api")
