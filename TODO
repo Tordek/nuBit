@@ -12,4 +12,4 @@
     [ ] `npm run build && cp -R build ../backend/`
 [ ] Style
 [ ] Make `status` and `ranking` show links to the website
-[ ] Check if is_admin
+[x] Check if is_admin
