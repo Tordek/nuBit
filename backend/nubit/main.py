@@ -26,7 +26,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(bot.start(BOT_TOKEN))
+    asyncio.create_task(bot.client.start(BOT_TOKEN))
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth")

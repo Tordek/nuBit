@@ -162,7 +162,7 @@ def find_entry_by_uuid(uuid: str) -> Optional[dict]:
 
 def find_entry_by_user(week: dict, user: dict) -> Optional[dict]:
     for entry in week["entries"]:
-        if entry["user_id"] == user.user_id:
+        if entry["discordID"] == user.user_id:
             return entry
     return None
 

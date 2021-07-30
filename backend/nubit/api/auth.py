@@ -1,30 +1,35 @@
 import os
 from typing import Optional
+import discord
 from fastapi import APIRouter, HTTPException, Depends, Response
 from fastapi_sessions.session_cookie import SessionInfo
 from pydantic import BaseModel
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from nubit.api.session import SessionData, session
+from nubit import bot
 
 CLIENT_ID = os.environ["CLIENT_ID"]
 CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 SERVER_ID = os.environ["SERVER_ID"]
+ADMIN_ROLE_ID = os.environ["ADMIN_ROLE_ID"]
 
 
 class OauthRequest(BaseModel):
     authorization_response: str
 
+
 router = APIRouter()
+
 
 @router.post("/discord")
 async def oauth(request: OauthRequest, response: Response) -> SessionData:
     scope = ["identify", "guilds"]
-    discord = OAuth2Session(client_id=CLIENT_ID, scope=scope,
+    discord_client = OAuth2Session(client_id=CLIENT_ID, scope=scope,
                             redirect_uri="http://localhost:8080/oauth/discord/")
 
     try:
-        discord.fetch_token(
+        discord_client.fetch_token(
             token_url="https://discord.com/api/oauth2/token",
             client_secret=CLIENT_SECRET,
             code=request.authorization_response
@@ -33,27 +38,27 @@ async def oauth(request: OauthRequest, response: Response) -> SessionData:
         raise HTTPException(status_code=401, detail="Failure obtaining data")
 
     # Fetch user's nickname
-    user_request = discord.get("https://discord.com/api/users/@me")
+    user_request = discord_client.get("https://discord.com/api/users/@me")
     if 200 > user_request.status_code or user_request.status_code > 299:
         raise HTTPException(
             status_code=401, detail="Failure obtaining user data")
     user_data = user_request.json()
 
-    # Check if user is in 8BMT's server
-    channels_request = discord.get("https://discord.com/api/users/@me/guilds")
-    if 200 > channels_request.status_code or user_request.status_code > 299:
+    # Validate if user is admin
+    guild = bot.client.get_guild(int(SERVER_ID))
+    try:
+        member = await guild.fetch_member(user_data["id"])
+    except discord.errors.NotFound:
         raise HTTPException(
-            status_code=401, detail="Failure obtaining guild data")
-    servers_data = channels_request.json()
+            status_code=401, detail="User is not a member of the server")
 
-    if not any(True for server in servers_data if server["id"] == SERVER_ID):
-        raise HTTPException(status_code=401, detail="User is not in 8BMT")
+    is_admin = int(ADMIN_ROLE_ID) in member.roles
 
     user = SessionData(
         user_id=user_data["id"],
-        username=user_data["username"],
+        username=member.nickname,
         avatar=user_data["avatar"],
-        is_admin=False
+        is_admin=is_admin
     )
     await session.create_session(user, response)
 

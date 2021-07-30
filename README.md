@@ -24,6 +24,12 @@ Backend settings:
 - `SERVER_ID=` - We want to check that the user belongs to the server,
     so put the proper ID here
 - `COOKIE_SECRET=` - A random string to encrypt cookies
+- `BOT_TOKEN=` - The Discord Bot token
+- `ADMIN_ROLE_ID=` - ID for the Role given to admins on the server.
+- `COMMAND_PREFIXES=` - Space-separated list of valid command prefixes
+- `NOTIFY_ADMINS_CHANNEL=` - ID for the channel where admin notifications are
+    sent
+- `URL_BASE=` - Base URL assets will be served from.
 
 Running
 -------

@@ -6,25 +6,25 @@ import logging
 import discord
 import io
 import datetime
+import os
+
+from discord.flags import Intents
 from nubit import compo
+
+COMMAND_PREFIXES = os.environ["COMMAND_PREFIXES"]
+SERVER_ID = os.environ["SERVER_ID"]
+ADMIN_ROLE_ID = os.environ["ADMIN_ROLE_ID"]
+NOTIFY_ADMINS_CHANNEL = os.environ["NOTIFY_ADMINS_CHANNEL"]
+URL_BASE = os.environ["URL_BASE"]
 
 dm_reminder = "_Ahem._ DM me to use this command."
 client = commands.Bot(description="Musical Voting Platform",
                       pm_help=False,
-                      command_prefix=[],
+                      command_prefix=COMMAND_PREFIXES.split(),
                       case_insensitive=True,
+                      intents=Intents.default(),
                       help_command=None)
-config = None
-logger = logging.getLogger("nubit.Bot")
-
-
-async def start(_config):
-    global config
-
-    config = _config
-    client.command_prefix = config["command_prefix"]
-
-    await client.start(config["bot_key"])
+logger = logging.getLogger("nuBit.bot")
 
 
 async def notify_admins(msg: str) -> None:
@@ -36,15 +36,12 @@ async def notify_admins(msg: str) -> None:
     msg : str
         The message that should be sent
     """
-    global config
 
-    if config.get("notify_admins_channel"):
-        await client.get_channel(config["notify_admins_channel"]).send(msg)
+    if NOTIFY_ADMINS_CHANNEL:
+        await client.get_channel(NOTIFY_ADMINS_CHANNEL).send(msg)
 
 
 def entry_info_message(entry: dict) -> str:
-    global config
-
     entry_message = '%s submitted "%s":\n' % (entry["entrantName"],
                                               entry["entryName"])
 
@@ -53,7 +50,7 @@ def entry_info_message(entry: dict) -> str:
     if "mp3" in entry:
         if entry["mp3Format"] == "mp3":
             entry_message += "MP3: %s/files/%s/%s %d KB\n" \
-                % (config["url_prefix"],
+                % (URL_BASE,
                    entry["uuid"],
                    urllib.parse.quote(entry["mp3Filename"]),
                    len(entry["mp3"]) / 1000)
@@ -63,7 +60,7 @@ def entry_info_message(entry: dict) -> str:
     # If a score was attached, make note of it in the message
     if "pdf" in entry:
         entry_message += "PDF: %s/files/%s/%s %d KB\n" \
-            % (config["url_prefix"],
+            % (URL_BASE,
                entry["uuid"],
                urllib.parse.quote(entry["pdfFilename"]),
                len(entry["pdf"]) / 1000)
@@ -109,7 +106,6 @@ def help_message(full: bool = False, is_admin: bool = False) -> str:
     str
         The generated help message.
     """
-    global config
 
     commands = ["howmany", "submit", "vote", "status", "myresults"]
     admin_commands = [
@@ -127,7 +123,7 @@ def help_message(full: bool = False, is_admin: bool = False) -> str:
     else:
         msg += "Submissions for this week's prompt are now closed.\n"
         msg += ("To see the already submitted entries for this week, "
-                "head on over to " + config["url_prefix"]) + "\n"
+                "head on over to " + URL_BASE) + "\n"
 
     if not full:
         msg += "Send `" + client.command_prefix[
@@ -236,9 +232,17 @@ async def is_admin(context: commands.Context) -> bool:
     Bot command check: Returns `true` if the user is an admin.
     Throws `IsNotAdminError()` on failure.
     """
-    global config
+    guild = client.get_guild(int(SERVER_ID))
 
-    if context.author.id not in config["admins"]:
+    is_admin = False
+    try:
+        member = await guild.fetch_member(context.author.id)
+        is_admin = int(ADMIN_ROLE_ID) in member.roles
+    except discord.errors.NotFound:
+        # The user isn't even on the server
+        pass
+
+    if not is_admin:
         raise IsNotAdminError()
 
     return True
@@ -251,7 +255,7 @@ def is_postentries_channel():
     Throws `WrongChannelError` on failure.
     """
     def predicate(context: commands.Context):
-        if context.channel.id == config.get("postentries_channel"):
+        if context.channel.id == POSTENTRIES_CHANNEL:
             return True
 
         raise WrongChannelError()
@@ -352,7 +356,7 @@ async def howlong(context: commands.Context) -> None:
     Prints how long is left until the deadline
     """
 
-    timezone_offset = datetime.timedelta(hours=config["timezone_offset"])
+    timezone_offset = datetime.timedelta(hours=TIMEZONE_OFFSET)
 
     today = datetime.date.today()
     date_offset = datetime.timedelta((4 - today.weekday()) % 7)
@@ -412,18 +416,16 @@ async def help(context: commands.Context) -> None:
 @commands.dm_only()
 async def status(context: commands.Context) -> None:
     """Displays the status of your entry for this week."""
-    global config
-
     week = compo.get_week(True)
 
-    for entry in week["entries"]:
-        if entry["discordID"] == context.author.id:
-            await context.send(entry_info_message(entry))
-            return
+    entry = compo.find_entry_by_user(context.author.id)
+    if entry is None:
+        await context.send("You haven't submitted anything yet! "
+                           "But if you want to you can with %ssubmit !" %
+                           client.command_prefix[0])
+        return
 
-    await context.send("You haven't submitted anything yet! "
-                       "But if you want to you can with %ssubmit !" %
-                       client.command_prefix[0])
+    await context.send(entry_info_message(entry))
 
 
 @client.command()
