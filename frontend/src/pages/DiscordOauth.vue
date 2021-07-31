@@ -1,12 +1,21 @@
 <template>
-  <div>
-    <progress v-if="error === null" class="progress is-large is-info" max="100"
-      >Logging you in...</progress
-    >
-    <p v-else>
-      There's been an error logging in. <router-link to="/">Go back home</router-link>.
-    </p>
-  </div>
+  <section class="section">
+    <div class="container">
+      <template v-if="error === null">
+        <h1 class="title">Logging you in, hold on...</h1>
+        <progress class="progress is-large is-info" max="100"
+          >Logging you in...</progress
+        >
+      </template>
+      <template v-else>
+        <h1 class="title">Oh no!</h1>
+        <h2 class="subtitle">
+          There's been an error during login.
+        </h2>
+        <p><router-link to="/">Go back home</router-link>.</p>
+      </template>
+    </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -19,7 +28,7 @@ export default Vue.extend({
   data() {
     return {
       error: null as null | string
-    }
+    };
   },
   async mounted() {
     const query = this.$route.query;
