@@ -17,6 +17,7 @@ ADMIN_ROLE_ID = os.environ["ADMIN_ROLE_ID"]
 NOTIFY_ADMINS_CHANNEL = os.environ["NOTIFY_ADMINS_CHANNEL"]
 URL_BASE = os.environ["URL_BASE"]
 TIMEZONE_OFFSET = os.environ["TIMEZONE_OFFSET"]
+POSTENTRIES_CHANNEL = os.environ["POSTENTRIES_CHANNEL"]
 
 dm_reminder = "_Ahem._ DM me to use this command."
 client = commands.Bot(description="Musical Voting Platform",
