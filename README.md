@@ -28,7 +28,8 @@ Backend settings:
 - `COMMAND_PREFIXES=` - Space-separated list of valid command prefixes
 - `NOTIFY_ADMINS_CHANNEL=` - ID for the channel where admin notifications are
     sent
-- `URL_BASE=` - Base URL assets will be served from.
+- `URL_BASE=` - Base URL assets will be served from. (Likely equal to
+    `VUE_APP_API_URL`)
 - `TIMEZONE_OFFSET=` - Timezone delta between the server and the display.
 - `POSTENTRIES_CHANNEL=` - If defined, the !postentries command will only work
     here, since it generates a lot of spam.
