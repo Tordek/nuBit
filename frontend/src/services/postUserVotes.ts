@@ -1,19 +1,34 @@
-type VoteData = {
-    entryUUID: string,
-    voteForName: string,
-    voteParam: string,
-    rating: number | null
-};
+import { EntryId, singleVote, VoteData, VoteParam, VoteParamName, VoteReplyEntry, WeekData } from "@/types";
 
-export type PostUserVotesParams = {
-    votes: VoteData[],
-};
+const VUE_APP_API_URL = process.env['VUE_APP_API_URL']
 
-export default async function (voteData: PostUserVotesParams): Promise<void> {
-    const response = await fetch("submit_vote", {
-        method: "POST",
+function packVoteData(weekData: WeekData, voteData: VoteData): VoteReplyEntry[] {
+    const result: VoteReplyEntry[] = [];
+
+    for (const [entryId, votes] of Object.entries<singleVote>(voteData)) {
+        const entry = weekData.entries?.find(({ uuid }) => uuid === entryId)
+        if (entry === undefined) continue;
+        for (const [voteParam, value] of Object.entries<number | null>(votes)) {
+            if (value === null) continue;
+            result.push({
+                entryUUID: entryId as EntryId,
+                voteParam: voteParam as VoteParamName,
+                voteForName: entry.entrantName,
+                rating: value,
+            })
+        }
+    }
+
+    return result;
+}
+
+export default async function (weekData: WeekData, voteData: VoteData): Promise<void> {
+    const response = await fetch(`${VUE_APP_API_URL}/api/votes/me`, {
+        method: "PUT",
         credentials: "include",
-        body: JSON.stringify(voteData),
+        body: JSON.stringify({
+            votes: packVoteData(weekData, voteData)
+        }),
         headers: {
             "Content-Type": "application/json"
         }

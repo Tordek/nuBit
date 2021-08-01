@@ -39,4 +39,13 @@ export type UserData = {
     avatar: string,
 };
 
-export type VoteData = Record<EntryId, Record<VoteParamName, number | null>>;
+export type VoteReplyEntry = {
+    entryUUID: EntryId;
+    voteParam: VoteParamName;
+    voteForName: string;
+    rating: number | null;
+};
+
+export type singleVote = Record<VoteParamName, number | null>;
+
+export type VoteData = Record<EntryId, singleVote>;

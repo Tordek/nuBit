@@ -119,7 +119,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { UserData, VoteData, WeekData } from "../types";
-import postUserVotes, { PostUserVotesParams } from "@/services/postUserVotes";
+import postUserVotes from "@/services/postUserVotes";
 import EntryDetail from "../components/EntryDetail.vue";
 import VotingWidget from "./VotingWidget.vue";
 
@@ -171,25 +171,8 @@ export default Vue.extend({
 
       this.working = true;
 
-      let voteData: PostUserVotesParams = {
-        votes: [],
-      };
-
-      for (let entry of this.weekData.entries) {
-        for (let param of this.weekData.voteParams) {
-          if (this.voteData[entry.uuid][param.name] != null) {
-            voteData.votes.push({
-              entryUUID: entry.uuid,
-              voteForName: entry.entrantName,
-              voteParam: param.name,
-              rating: this.voteData[entry.uuid][param.name]
-            });
-          }
-        }
-      }
-
       try {
-        postUserVotes(voteData);
+        postUserVotes(this.weekData, this.voteData);
         this.$emit("votes-submitted");
       } catch (e) {
         alert(
