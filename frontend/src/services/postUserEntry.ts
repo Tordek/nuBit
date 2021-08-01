@@ -1,4 +1,4 @@
-import { UserDataResponse } from "./getUserData";
+import { Entry } from "@/types";
 
 export type SubmitRequest = {
   name: string,
@@ -9,7 +9,7 @@ export type SubmitRequest = {
 
 const API_URL = process.env['VUE_APP_API_URL']
 
-export default async function (entry: SubmitRequest): Promise<UserDataResponse> {
+export default async function (entry: SubmitRequest): Promise<Entry> {
   const formData = new FormData();
 
   formData.append("name", entry.name);

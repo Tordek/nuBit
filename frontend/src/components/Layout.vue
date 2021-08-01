@@ -17,7 +17,7 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="navbar-item">
-            <router-link to="/submit" class="button is-primary">Submit your entry</router-link>
+            <router-link to="/mine" class="button is-primary">My entry</router-link>
           </div>
           <UserInformation :user="user" @update:user="setUser" />
         </div>

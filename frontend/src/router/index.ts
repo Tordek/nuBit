@@ -4,7 +4,7 @@ import Layout from '../components/Layout.vue'
 import Home from '../pages/Home.vue'
 import Week from '../pages/Week.vue'
 import ErrorPage from '../pages/ErrorPage.vue'
-import Submit from '../pages/Submit.vue'
+import MySubmission from '../pages/MySubmission.vue'
 import OauthDiscord from '../pages/DiscordOauth.vue'
 
 Vue.use(VueRouter)
@@ -28,8 +28,8 @@ const routes: Array<RouteConfig> = [
         component: Week
       },
       {
-        path: 'submit',
-        component: Submit
+        path: 'mine',
+        component: MySubmission,
       },
     ]
   },

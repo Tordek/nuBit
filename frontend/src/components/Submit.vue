@@ -1,14 +1,7 @@
 <template>
-  <div class="block" v-if="state === 'thanks'">
-    <h1 class="title">Your entry has been recorded -- Good luck!!</h1>
-    <p>You can DM @8Bot the command <code>vote!status</code> to check the status of your entry!</p>
-    <p>If you have any issues, let us know in #weekly-challenge-discussion, or DM one of our friendly
-      moderators.</p>
-    <img width="500px" src="/static/kirb_thanks.png" />
-  </div>
-  <div v-else>
+  <div>
     <div class="block">
-      <h1 class="title">Hello, {{ user && user.username }}!</h1>
+      <h1 class="title">Get ready!</h1>
       <h2 class="subtitle">
         Thanks for participating this week, and congratulations for exercising
         your musical skills!
@@ -18,7 +11,7 @@
     <div class="column is-half is-offset-one-quarter">
       <template v-if="state === 'loading'">
         <h1 class="title">
-          Hold up, we're checking if you've already submitted something...
+          Hold on..
         </h1>
         <progress class="progress is-large is-info">Loading</progress>
       </template>
@@ -152,7 +145,6 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { Entry, EntryId, UserData } from "@/types";
-import getUserEntry from "@/services/getUserEntry";
 import getValidHosts from "@/services/getValidHosts";
 import postUserEntry, { SubmitRequest } from "@/services/postUserEntry";
 
@@ -171,13 +163,15 @@ function makeEmptyEntry(): Entry {
 
 export default Vue.extend({
   props: {
-    user: Object as PropType<UserData>
+    user: Object as PropType<UserData>,
+    initialEntry: Object as PropType<Entry>
   },
   data() {
+    let entry = this.initialEntry || makeEmptyEntry();
     return {
       state: "blank",
       entry: {
-        ...makeEmptyEntry(),
+        ...entry,
         mp3Format: "upload",
         mp3File: null,
         mp3Link: "",
@@ -196,16 +190,6 @@ export default Vue.extend({
       this.validHosts = await getValidHosts();
     } catch {
       this.error = "There was an issue, try reloading or notify an admin.";
-    }
-
-    try {
-      this.entry = {
-        ...(await getUserEntry()),
-        mp3Format: "keep",
-        pdfFormat: "keep"
-      };
-    } catch {
-      // No entry, no problem.
     }
 
     this.state = "editing";
@@ -231,9 +215,9 @@ export default Vue.extend({
           entry.mp3Link = this.entry.mp3Link;
         }
 
-        await postUserEntry(entry);
+        const result = await postUserEntry(entry);
 
-        this.state = "thanks";
+        this.$emit("update:entry", result);
       } catch (e) {
         alert(e.toString());
         this.state = "editing";
