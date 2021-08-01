@@ -14,3 +14,6 @@
 [ ] Style
 [ ] Make `status` and `ranking` show links to the website
 [X] Check if is_admin
+[ ] Admin section
+    [ ] Edit Week information - current and next
+    [ ] One-click swap, notify, and post entries.
