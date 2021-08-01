@@ -20,9 +20,9 @@ class OauthRequest(BaseModel):
 router = APIRouter()
 
 
-@router.get("/me", dependencies=[Depends(require_login)])
-def get_votes(session_info=Depends(session)):
-    votes = compo.get_week(False)['votes']
+@router.get("/me/{which}", dependencies=[Depends(require_login)])
+def get_votes(which, session_info=Depends(session)):
+    votes = compo.get_week(which == 'next')['votes']
     for vote in votes:
         if vote['userID'] == session_info["user_id"]:
             return vote['ratings']
@@ -71,4 +71,5 @@ def vote(body = Body(...), session_info=Depends(session)):
         "ratings": ratings
     })
 
+    compo.save_weeks()
     return {}

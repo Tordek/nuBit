@@ -17,7 +17,7 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="navbar-item">
-            <router-link to="/mine" class="button is-primary">My entry</router-link>
+            <router-link to="/results" class="button is-primary">My results</router-link>
           </div>
           <UserInformation :user="user" @update:user="setUser" />
         </div>

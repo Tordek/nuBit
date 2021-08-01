@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from nubit.helpers import require_admin, require_login, session
+from nubit.helpers import require_admin, session
 from nubit import compo
 
 CLIENT_ID = os.environ["CLIENT_ID"]
@@ -45,7 +45,6 @@ def format_week(week: dict, is_admin: bool) -> dict:
     """
     entryData = None
 
-    week["submissionsOpen"] = False
     if is_admin or not week["submissionsOpen"]:
         entryData = []
         for e in week["entries"]:

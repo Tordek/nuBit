@@ -1,4 +1,4 @@
-import { EntryId, VoteData, VoteParam, VoteParamName, WeekData } from "@/types";
+import { VoteData, VoteReplyEntry, WeekData } from "@/types";
 
 const API_URL = process.env.VUE_APP_API_URL;
 
@@ -21,9 +21,9 @@ function buildVoteData(weekData: WeekData, voteData: VoteReplyEntry[]): VoteData
   return votes;
 }
 
-export default async function (weekData: WeekData): Promise<VoteData> {
+export default async function (which, weekData: WeekData): Promise<VoteData> {
 
-  const request = await fetch(`${API_URL}/api/votes/me`, {
+  const request = await fetch(`${API_URL}/api/votes/me/${which}`, {
     credentials: "include"
   });
 

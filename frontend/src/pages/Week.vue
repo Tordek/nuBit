@@ -25,7 +25,7 @@ import getWeek from "@/services/getWeek";
 import getVoteData from "@/services/getVoteData";
 import { WeekData, VoteData, UserData } from "@/types";
 import Vue, { PropType } from "vue";
-import VoteListDetailView from "../components/VoteListDetailView.vue";
+import VoteListDetailView from "@/components/VoteListDetailView.vue";
 
 export default Vue.extend({
   props: {
@@ -44,10 +44,10 @@ export default Vue.extend({
   },
   async mounted() {
     try {
-      this.weekData = await getWeek({ which: this.$route.params.which });
+      this.weekData = await getWeek({ which: this.which });
 
-      if (this.user !== null && !this.weekData.submissionOpen && this.weekData.votingOpen) {
-        this.voteData = await getVoteData(this.weekData);
+      if (this.user !== null && !this.weekData.submissionOpen && this.weekData.votingOpen && this.which === 'current') {
+        this.voteData = await getVoteData(this.which, this.weekData);
       }
 
       this.mode = "vote";
@@ -57,9 +57,3 @@ export default Vue.extend({
   }
 });
 </script>
-
-<style scoped>
-#thanks {
-  width: 500px;
-}
-</style>

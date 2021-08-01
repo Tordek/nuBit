@@ -10,7 +10,19 @@ from nubit.helpers import require_login, session
 router = APIRouter()
 
 
-@router.get("/me", dependencies=[Depends(require_login)])
+@router.get("/me/next", dependencies=[Depends(require_login)])
+def view_my_submission(session_info=Depends(session)):
+    week = compo.get_week(False)
+    entry = compo.find_entry_by_user(week, session_info["user_id"])
+
+    if entry is None:
+        raise HTTPException(
+            status_code=404, detail="You didn't submit anything")
+
+    return get_entry_results(entry)
+
+
+@router.get("/me/next", dependencies=[Depends(require_login)])
 def view_my_submission(session_info=Depends(session)):
     week = compo.get_week(True)
     entry = compo.find_entry_by_user(week, session_info["user_id"])
@@ -22,7 +34,7 @@ def view_my_submission(session_info=Depends(session)):
     return get_editable_entry(entry)
 
 
-@router.delete("/me", dependencies=[Depends(require_login)])
+@router.delete("/me/next", dependencies=[Depends(require_login)])
 def delete_my_submission(session_info=Depends(session)):
     raise NotImplementedError()
     week = compo.get_week(True)
@@ -39,7 +51,7 @@ def delete_my_submission(session_info=Depends(session)):
     pass
 
 
-@router.put("/me", dependencies=[Depends(require_login)])
+@router.put("/me/next", dependencies=[Depends(require_login)])
 async def update_my_submission(
     session_info=Depends(session),
     name: str = Form(...),
@@ -81,11 +93,6 @@ async def update_my_submission(
     return get_editable_entry(entry)
 
 
-@router.put("/me", dependencies=[Depends(require_login)])
-async def update_my_submission():
-    raise NotImplementedError()
-
-
 # Helpers
 def get_editable_entry(entry: dict) -> dict:
     entry_data = {
@@ -105,3 +112,7 @@ def get_editable_entry(entry: dict) -> dict:
         entry_data["pdfUrl"] = f"/files/{entry['uuid']}/{entry.get('pdfFilename')}"
 
     return entry_data
+
+
+def get_entry_results(week: dict, entry: dict) -> dict:
+    pass

@@ -5,7 +5,7 @@
 [X] Submit
 [X] Vote
 [x] View status for own submission
-[ ] View more status for own submission
+[X] View more status for own submission
 [X] Make the Discord bot part... exist.
 [ ] Provide an installing script:
     [ ] `nginx.conf` - See Vue's docs: needs to serve static files if found, then `api` from backend, then anything else points to the `vue` root at index.html

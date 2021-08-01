@@ -5,6 +5,7 @@ import Home from '../pages/Home.vue'
 import Week from '../pages/Week.vue'
 import ErrorPage from '../pages/ErrorPage.vue'
 import MySubmission from '../pages/MySubmission.vue'
+import MyResults from '../pages/MyResults.vue'
 import OauthDiscord from '../pages/DiscordOauth.vue'
 
 Vue.use(VueRouter)
@@ -25,11 +26,16 @@ const routes: RouteConfig[] = [
       },
       {
         path: 'weeks/:which',
-        component: Week
+        component: Week,
+        props: true
       },
       {
         path: 'mine',
         component: MySubmission,
+      },
+      {
+        path: 'results',
+        component: MyResults,
       },
     ]
   },

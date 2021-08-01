@@ -11,11 +11,25 @@
         <h1 class="title">{{ entry.entryName }}</h1>
         <p>Download the <a :href="entry.mp3Url">MP3</a></p>
         <p>Download the <a :href="entry.pdfUrl">PDF</a></p>
-        <p><a @click="state = 'submit'" class="button is-primary">Change it!</a></p>
+        
+        <template v-if="entry.results === undefined">
+            <p>Results are still coming in, be patient...</p>
+        </template>
+
+        <template v-else>
+            <p>Your average score was {{ entry.results.overall.rating }}!</p>
+
+            <p>On each of the categories, you got...</p>
+            <ul>
+                <li v-for="rating in entry.results.ratings" :key="rating.name">
+                  <b>{{rating.description}}</b>: {{rating.rating}}
+                </li>
+            </ul>
+        </template>
       </template>
       <template v-else-if="state === 'display'">
-        <h1>You haven't submitted anything yet...</h1>
-        <p><a @click="state = 'submit'" class="button is-primary">Submit something!</a></p>
+        <h1>You didn't submit anything last week...</h1>
+        <p><router-link to="/mine">But you can try next week!</router-link></p>
       </template>
 
       <template v-else-if="state === 'submit'">
@@ -47,7 +61,7 @@ export default Vue.extend({
     this.state = "loading";
 
     try {
-      this.entry = await getUserEntry({ which: 'next' });
+      this.entry = await getUserEntry({ which: 'current' });
     } catch {
       // No entry, no problem.
     }

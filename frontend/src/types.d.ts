@@ -1,5 +1,5 @@
-export type EntryId = string & { readonly __tag: unique symbol };
-export type VoteParamName = string & { readonly __tag: unique symbol };
+export type EntryId = string;
+export type VoteParamName = string;
 
 export type WeekData = {
     votingOpen: boolean;
@@ -17,6 +17,12 @@ export type VoteParam = {
     helpTips: Record<number, string>;
 }
 
+type Result = {
+    name: VoteParamName;
+    description: string;
+    rating;
+}
+
 export type Entry = {
     uuid: EntryId;
     entrantName: string;
@@ -27,6 +33,10 @@ export type Entry = {
     mp3Format: string;
     isValid: boolean;
     entryNotes?: string;
+    results?: {
+        overall: Result;
+        ratings: Result[];
+    }
 };
 
 export type AuthenticatedQuery = {

@@ -82,7 +82,6 @@ def get_week(get_next_week: bool) -> dict:
             current_week = pickle.load(open("weeks/current-week.pickle", "rb"))
         except FileNotFoundError:
             current_week = blank_week()
-            current_week["submissions_open"] = False
 
     if next_week is None:
         try:
