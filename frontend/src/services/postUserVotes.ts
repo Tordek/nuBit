@@ -6,13 +6,13 @@ type VoteData = {
 };
 
 export type PostUserVotesParams = {
-    votes: Array<VoteData>,
-    voteKey: string
+    votes: VoteData[],
 };
 
 export default async function (voteData: PostUserVotesParams): Promise<void> {
     const response = await fetch("submit_vote", {
         method: "POST",
+        credentials: "include",
         body: JSON.stringify(voteData),
         headers: {
             "Content-Type": "application/json"

@@ -4,7 +4,8 @@ export type VoteParamName = string & { readonly __tag: unique symbol };
 export type WeekData = {
     votingOpen: boolean;
     submissionOpen: boolean;
-    entries: Entry[];
+    entries: Entry[] | null;
+    entryCount: number;
     voteParams: VoteParam[];
     theme: string;
     date: string;

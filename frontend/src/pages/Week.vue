@@ -1,17 +1,21 @@
 <template>
-  <div>
-    <div v-if="mode === 'loading'">Loading...</div>
-    <VoteListDetailView
-      v-else-if="mode === 'vote'"
-      :week-data="weekData"
-      @vote-submitted="mode = 'thanks'"
-    />
-    <div v-else-if="mode === 'thanks'" id="content">
-      <div class="submit-babble">
-        <h2>Thank you for voting!</h2>
-        <p>Your vote has been recorded. I will guard it with my life. :)</p>
-        <img src="/static/kirb_thanks.png" alt="Thanks!" />
-      </div>
+  <div v-if="mode === 'loading'">
+    <h1 class="title">Loading...</h1>
+    <progress class="progress is-large" />
+  </div>
+
+  <VoteListDetailView
+    v-else-if="mode === 'vote'"
+    :week-data="weekData"
+    :vote-data="voteData"
+    @vote-submitted="mode = 'thanks'"
+  />
+
+  <div v-else-if="mode === 'thanks'">
+    <div class="submit-babble">
+      <h2>Thank you for voting!</h2>
+      <p>Your vote has been recorded. I will guard it with my life. :)</p>
+      <img src="/static/kirb_thanks.png" alt="Thanks!" />
     </div>
   </div>
 </template>
@@ -40,7 +44,7 @@ export default Vue.extend({
   },
   async mounted() {
     try {
-      this.weekData = await getWeek({which: this.which});
+      this.weekData = await getWeek({ which: this.$route.params.which });
 
       if (this.user !== null) {
         this.voteData = await getVoteData();

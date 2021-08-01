@@ -9,7 +9,7 @@ import OauthDiscord from '../pages/DiscordOauth.vue'
 
 Vue.use(VueRouter)
 
-const routes: Array<RouteConfig> = [
+const routes: RouteConfig[] = [
   {
     path: '/oauth/discord',
     name: "OauthDiscord",
@@ -24,7 +24,7 @@ const routes: Array<RouteConfig> = [
         component: Home
       },
       {
-        path: 'week/:which',
+        path: 'weeks/:which',
         component: Week
       },
       {

@@ -190,7 +190,7 @@ export default Vue.extend({
     return {
       state: "blank",
       entry: entry as Record<string, any>, // TODO: Fix.
-      validHosts: [] as Array<string>,
+      validHosts: [] as string[],
       error: null as null | string
     };
   },

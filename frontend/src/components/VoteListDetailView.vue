@@ -1,72 +1,72 @@
 <template>
   <div>
-    <div v-show="working">
-      PUT A SPINNER HERE OR SOMETHING I'M LAZY
-    </div>
-    <transition name="entry-list-toggle">
-      <div v-show="showEntryList">
-        <h2>{{ weekData.theme }}</h2>
-        <h3>{{ weekData.date }} - {{ entries.length }} entries</h3>
+    <h1 class="title">{{ weekData.theme }}</h1>
 
-        <table cellpadding="0">
-          <thead>
-            <tr>
-              <th>Entrant</th>
-              <th>Composition Title</th>
-              <th>View &amp; Listen</th>
-              <th>Download</th>
-              <th
-                v-for="voteParam in weekData.voteParams"
-                :key="voteParam.name"
-              >
-                {{ voteParam.description }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(entry, entryIndex) in entries" :key="entryIndex">
-              <td>{{ entry.entrantName }}</td>
-              <td>{{ entry.entryName }}</td>
-              <td
-                :class="{
-                  'entry-cell-selected': viewedEntryIndex == entryIndex
-                }"
-              >
-                <button class="icon-button" @click="viewEntry(entryIndex)">
-                  <img src="/static/interface-video-play.png" alt="Play" />
-                </button>
-              </td>
-              <td>
-                <a :href="entry.mp3Url" target="_blank">MP3</a>
-                <a :href="entry.pdfUrl" target="_blank">PDF</a>
-              </td>
-              <td
-                v-for="voteParam in weekData.voteParams"
-                :key="voteParam.name"
-              >
-                <VotingWidget
-                  :paramData="voteParam"
-                  v-model="entry[voteParam.name]"
-                  @input="updateNumEntriesRated"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <h2 class="subtitle">
+      {{ weekData.date }} - {{ weekData.entryCount }} entries<template
+        v-if="weekData.entries === null"
+      >
+        so far</template
+      >
+    </h2>
 
-        <div v-if="weekData.votingOpen">
-          <p>
-            You've rated {{ numEntriesRated }}/{{ entries.length }} entries.
-          </p>
-          <button @click="submitVote">
-            Submit Vote
-          </button>
-        </div>
-        <div v-else>
-          <p>Voting for this week is now closed.</p>
-        </div>
+    <template v-if="weekData.entries !== null">
+      <table class="table is-hoverable">
+        <thead>
+          <tr>
+            <th>Entrant</th>
+            <th>Composition Title</th>
+            <th>View &amp; Listen</th>
+            <th>Download</th>
+            <th v-for="voteParam in weekData.voteParams" :key="voteParam.name">
+              {{ voteParam.description }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(entry, entryIndex) in weekData.entries"
+            :key="entryIndex"
+            :class="{ 'is-selected': viewedEntryIndex == entryIndex }"
+          >
+            <td>{{ entry.entrantName }}</td>
+            <td>{{ entry.entryName }}</td>
+            <td>
+              <button class="icon-button" @click="viewEntry(entryIndex)">
+                <img src="/static/interface-video-play.png" alt="Play" />
+              </button>
+            </td>
+            <td>
+              <a :href="entry.mp3Url" target="_blank">MP3</a>
+              <a :href="entry.pdfUrl" target="_blank">PDF</a>
+            </td>
+            <td v-for="voteParam in weekData.voteParams" :key="voteParam.name">
+              <VotingWidget
+                v-if="user"
+                :paramData="voteParam"
+                :disabled="!weekData.votingOpen"
+                v-model="voteData[entry.uuid][voteParam.name]"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div v-if="weekData.entries !== null && weekData.votingOpen">
+        <p>
+          You've rated {{ numEntriesRated }}/{{ weekData.entries.length }}
+          entries.
+        </p>
+        <button @click="submitVote">Submit Vote</button>
       </div>
-    </transition>
+    </template>
+
+    <div v-else>
+      <p>
+        Submissions are still coming in! You can't see them yet, but you'll be
+        able to soon.
+      </p>
+    </div>
 
     <div
       class="pdf-container"
@@ -85,7 +85,11 @@
         </div>
       </div>
 
-      <EntryDetail v-else :entry="weekData.entries[viewedEntryIndex]" :voteParams="weekData.voteParams"/>
+      <EntryDetail
+        v-else
+        :entry="weekData.entries[viewedEntryIndex]"
+        :voteParams="weekData.voteParams"
+      />
     </div>
 
     <div>
@@ -115,7 +119,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { WeekData } from "../types";
+import { UserData, VoteData, WeekData } from "../types";
 import postUserVotes, { PostUserVotesParams } from "@/services/postUserVotes";
 import EntryDetail from "../components/EntryDetail.vue";
 import VotingWidget from "./VotingWidget.vue";
@@ -123,16 +127,16 @@ import VotingWidget from "./VotingWidget.vue";
 export default Vue.extend({
   components: { EntryDetail, VotingWidget },
   props: {
-    weekData: Object as PropType<WeekData>,
-    userVoteKey: String
+    user: Object as PropType<UserData>,
+    weekData: Object as PropType<WeekData>
   },
   data() {
     return {
       showEntryList: true,
       pdfColorInvert: false,
       viewedEntryIndex: null as number | null,
-      working: false,
-      entries: this.weekData.entries
+      voteData: null as VoteData | null,
+      working: false
     };
   },
   methods: {
@@ -147,42 +151,38 @@ export default Vue.extend({
       this.pdfColorInvert = !this.pdfColorInvert;
     },
     selectAdjacentEntry(offset: number) {
+      if (this.weekData.entries === null) return;
       if (this.viewedEntryIndex === null) return;
 
       let index = this.viewedEntryIndex + offset;
 
       if (index < 0) {
         index = 0;
-      } else if (index >= this.entries.length) {
-        index = this.entries.length - 1;
+      } else if (index >= this.weekData.entries.length) {
+        index = this.weekData.entries.length - 1;
       }
 
       this.viewedEntryIndex = index;
       this.showEntryList = false;
     },
     async submitVote() {
-      this.working = true;
+      if (this.weekData.entries === null) return;
+      if (this.voteData === null) return;
 
-      if (this.userVoteKey === "") {
-        alert(
-          'Please enter a vote key! (To obtain a vote key, DM the command "vote!vote" to @8Bot on the 8BMT discord server.'
-        );
-        return;
-      }
+      this.working = true;
 
       let voteData: PostUserVotesParams = {
         votes: [],
-        voteKey: this.userVoteKey
       };
 
-      for (let entry of this.entries) {
+      for (let entry of this.weekData.entries) {
         for (let param of this.weekData.voteParams) {
-          if (entry[param.name] != null) {
+          if (this.voteData[entry.uuid][param.name] != null) {
             voteData.votes.push({
               entryUUID: entry.uuid,
               voteForName: entry.entrantName,
               voteParam: param.name,
-              rating: entry[param.name]
+              rating: this.voteData[entry.uuid][param.name]
             });
           }
         }
@@ -200,13 +200,18 @@ export default Vue.extend({
       this.working = false;
     }
   },
-  computed: {    
+  computed: {
     numEntriesRated() {
+      if (this.weekData.entries === null) return 0;
+      if (this.voteData === null) return 0;
       var total = 0;
 
-      for (let entry of this.entries) {
-        for (let param of this.weekData.voteParams) {
-          if (entry[param.name] !== null && entry[param.name] != 0) {
+      for (const entry of this.weekData.entries) {
+        for (const param of this.weekData.voteParams) {
+          if (
+            this.voteData[entry.uuid][param.name] !== null &&
+            this.voteData[entry.uuid][param.name] !== 0
+          ) {
             total++;
             break;
           }
@@ -214,7 +219,7 @@ export default Vue.extend({
       }
 
       return total;
-    },
+    }
   }
 });
 </script>

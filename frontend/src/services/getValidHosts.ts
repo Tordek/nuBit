@@ -1,6 +1,6 @@
 const VUE_APP_API_URL = process.env['VUE_APP_API_URL']
 
-export default async function (): Promise<Array<string>> {
+export default async function (): Promise<string[]> {
     const request = await fetch(`${VUE_APP_API_URL}/api/hosts/`);
 
     if (!request.ok) {

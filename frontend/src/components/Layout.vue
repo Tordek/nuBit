@@ -11,7 +11,7 @@
           <router-link to="/weeks/current">Current week entries</router-link>
         </div>        
         <div class="navbar-item">
-          <router-link to="/weeks/previous">Previous week entries</router-link>
+          <router-link to="/weeks/next">Next week entries</router-link>
         </div>
       </div>
       <div class="navbar-end">
@@ -24,7 +24,7 @@
       </div>
     </nav>
     <section class="section">
-      <RouterView :user="user" />
+      <RouterView :user="user" :key="$route.fullPath" />
     </section>
   </div>
 </template>
