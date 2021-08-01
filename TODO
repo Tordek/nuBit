@@ -18,5 +18,5 @@
     [ ] Edit Week information - current and next
     [ ] One-click swap, notify, and post entries.
     [ ] View and delete user votes
-[ ] Logout
-[ ] Session Expiry
+[X] Logout
+[X] Session Expiry

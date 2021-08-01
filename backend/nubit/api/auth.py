@@ -3,6 +3,7 @@ from typing import Optional
 import discord
 from fastapi import APIRouter, HTTPException, Depends, Response, Request
 from pydantic import BaseModel
+from requests import sessions
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from nubit import bot
@@ -71,11 +72,12 @@ async def oauth(oauth: OauthRequest, session=Depends(session)):
             status_code=401, detail="User is not a member of the server")
 
     is_admin = int(ADMIN_ROLE_ID) in member.roles
+    avatar = f"https://cdn.discordapp.com/avatars/{user_data['id']}/{user_data['avatar']}.png"
 
     del session['state']
     session['user_id'] = user_data["id"]
     session['username'] = member.nick or user_data["username"]
-    session['avatar'] = user_data["avatar"]
+    session['avatar'] = avatar
     session['is_admin'] = is_admin
     session['access_token'] = token["access_token"]
     session['refresh_token'] = token["refresh_token"]
@@ -96,3 +98,9 @@ async def me(session=Depends(session)):
         'avatar': session['avatar'],
         'is_admin': session['is_admin'],
     }
+
+
+@router.post("/logout", dependencies=[Depends(require_login)])
+async def logout(session=Depends(session)):
+    session.clear()
+    return {}

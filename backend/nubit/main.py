@@ -27,7 +27,8 @@ app.add_middleware(
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key=COOKIE_SECRET
+    secret_key=COOKIE_SECRET,
+    max_age=3600
 )
 
 
