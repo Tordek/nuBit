@@ -7,6 +7,7 @@ import ErrorPage from '../pages/ErrorPage.vue'
 import MySubmission from '../pages/MySubmission.vue'
 import MyResults from '../pages/MyResults.vue'
 import OauthDiscord from '../pages/DiscordOauth.vue'
+import Admin from '../pages/Admin.vue'
 
 Vue.use(VueRouter)
 
@@ -37,6 +38,10 @@ const routes: RouteConfig[] = [
         path: 'results',
         component: MyResults,
       },
+      {
+        path: 'admin',
+        component: Admin
+      }
     ]
   },
   {

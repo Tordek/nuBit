@@ -12,6 +12,9 @@
         </div>        
         <div class="navbar-item">
           <router-link to="/weeks/next">Next week entries</router-link>
+        </div>        
+        <div class="navbar-item">
+          <router-link to="/admin">Admin</router-link>
         </div>
       </div>
       <div class="navbar-end">
