@@ -71,15 +71,13 @@
           </template>
 
           <template v-else-if="entry.mp3Format === 'external'">
-            <label for="mp3Link"
+            <p>
+            <input v-model="entry.mp3Link" type="text" id="mp3Link" class="input" />
+            </p>
+            <p><label for="mp3Link"
               >If you have an external link to your submission (e.g.
               SoundCloud), you can enter that here.</label
-            >
-            <input type="text" v-model="entry.mp3Link" />
-
-            <div v-if="mp3LinkError" class="error-message">
-              {{ mp3LinkError }}
-            </div>
+            ></p>
           </template>
 
           <a v-else-if="entry.mp3Format === 'keep'" :href="entry.mp3Url"
@@ -127,6 +125,15 @@
           </div>
         </div>
 
+        <div v-if="!valid" class="message is-warning">
+          <div class="message-header">Hold up!</div>
+          <div class="message-body">
+            <p v-for="error in Object.values(errors)" :key="error">
+              {{ error }}
+            </p>
+          </div>
+        </div>
+
         <input
           class="button is-primary"
           type="submit"
@@ -148,37 +155,41 @@ import { Entry, EntryId, UserData } from "@/types";
 import getValidHosts from "@/services/getValidHosts";
 import postUserEntry, { SubmitRequest } from "@/services/postUserEntry";
 
-function makeEmptyEntry(): Entry {
-  return {
-    entrantName: "",
-    entryName: "",
-    mp3Format: "",
-    mp3Url: "",
-    pdfUrl: "",
-    uuid: "" as EntryId,
-    pdfFormat: "",
-    isValid: true
-  };
-}
-
 export default Vue.extend({
   props: {
     user: Object as PropType<UserData>,
     initialEntry: Object as PropType<Entry>
   },
   data() {
-    let entry = this.initialEntry || makeEmptyEntry();
-    return {
-      state: "blank",
-      entry: {
-        ...entry,
+    let entry;
+    if (this.initialEntry === null) {
+      entry = {
+        entrantName: "",
+        entryName: "",
+        mp3Url: "",
+        pdfUrl: "",
+        uuid: "" as EntryId,
+        isValid: true,
         mp3Format: "upload",
         mp3File: null,
         mp3Link: "",
         pdfFormat: "upload",
-        pdfFile: null,
-        isValid: true
-      } as Record<string, any>, // TODO: Fix.
+        pdfFile: null
+      };
+    } else {
+      entry = {
+        ...this.initialEntry,
+        mp3Format: "keep",
+        mp3File: null,
+        mp3Link: "",
+        pdfFormat: "keep",
+        pdfFile: null
+      };
+    }
+
+    return {
+      state: "blank",
+      entry: entry as Record<string, any>, // TODO: Fix.
       validHosts: [] as Array<string>,
       error: null as null | string
     };
@@ -238,38 +249,37 @@ export default Vue.extend({
     }
   },
   computed: {
-    valid() {
+    errors() {
+      const errors = {} as Record<string, string>;
+
       if (this.entry.entryName === "") {
-        return false;
+        errors["entryName"] = "The entry name can't be blank";
       }
 
       if (this.entry.pdfFormat === "upload" && this.entry.pdfFile === null) {
-        return false;
+        errors["pdf"] = "You haven't chosen a PDF file";
       }
 
-      if (this.entry.mp3Format === "external" && this.entry.mp3Link === "") {
-        return false;
+      if (this.entry.mp3Format === "external") {
+        if (this.entry.mp3Link === "") {
+          errors["mp3"] = "The MP3 link can't be empty";
+        } else if (
+          !this.validHosts.some(host => this.entry.mp3Link.startsWith(host))
+        ) {
+          errors["mp3"] =
+            "This audio hosting website is not in the approved list. " +
+            `Please use one of these: ${this.validHosts.join(", ")}`;
+        }
       }
 
       if (this.entry.mp3Format === "upload" && this.entry.mp3File === null) {
-        return false;
+        errors["mp3"] = "You haven't chosen an MP3 file";
       }
 
-      return true;
+      return errors;
     },
-    mp3LinkError() {
-      if (this.entry.mp3Link === "") {
-        return "Link can't be empty.";
-      }
-
-      if (this.validHosts.some(host => this.entry.mp3Link.startsWith(host))) {
-        return false;
-      }
-
-      return (
-        "This audio hosting website is not in the approved list. " +
-        `Please use one of these: ${this.validHosts.join(", ")}`
-      );
+    valid() {
+      return Object.keys(this.errors).length === 0;
     }
   }
 });
