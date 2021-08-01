@@ -2,7 +2,7 @@
   <div>
     <object :data="entry.pdfUrl" type="application/pdf">
       <div>
-        <img src="/static/kirb_think.png" />
+        <img src="@/assets/kirb_think.png" />
         <h2>
           <a :href="entry.pdfUrl">Link to PDF (embedded viewer failed)</a>
         </h2>
@@ -16,11 +16,11 @@
       type="audio/mpeg"
     />
     <div v-else>
-      <img src="/static/interface-play.png" />
+      <img src="@/assets/interface-play.png" />
       <a :href="entry.mp3Url" target="_blank">Listen Here!</a>
     </div>
     <div>
-      <div v-for="voteParam in voteParams" :key="voteParam">
+      <div v-for="voteParam in voteParams" :key="voteParam.name">
         <p class="vote-star-bottom-label">{{ voteParam.description }}</p>
         <VotingWidget
           :paramData="voteParam"

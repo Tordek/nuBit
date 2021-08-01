@@ -7,7 +7,7 @@
   <VoteListDetailView
     v-else-if="mode === 'vote'"
     :week-data="weekData"
-    :vote-data="voteData"
+    :initial-vote-data="voteData"
     @vote-submitted="mode = 'thanks'"
   />
 
@@ -15,7 +15,7 @@
     <div class="submit-babble">
       <h2>Thank you for voting!</h2>
       <p>Your vote has been recorded. I will guard it with my life. :)</p>
-      <img src="/static/kirb_thanks.png" alt="Thanks!" />
+      <img src="@/assets/kirb_thanks.png" alt="Thanks!" />
     </div>
   </div>
 </template>
@@ -46,8 +46,8 @@ export default Vue.extend({
     try {
       this.weekData = await getWeek({ which: this.$route.params.which });
 
-      if (this.user !== null) {
-        this.voteData = await getVoteData();
+      if (this.user !== null && !this.weekData.submissionOpen && this.weekData.votingOpen) {
+        this.voteData = await getVoteData(this.weekData);
       }
 
       this.mode = "vote";

@@ -8,19 +8,19 @@
       <button
         @click="vote(starNum)"
         class="vote-star"
-        v-tooltip="paramData.helpTipDefs[starNum]"
+        v-tooltip="paramData.helpTips[starNum]"
         :title="`Vote ${starNum} out of 5 in this category.`"
       >
         <img
           v-if="value >= starNum"
           class="vote-star-img"
-          src="../assets/interface-star-yes.svg"
+          src="@/assets/interface-star-yes.svg"
           :alt="`Vote ${starNum} out of 5 in this category.`"
         />
         <img
           v-else
           class="vote-star-img"
-          src="../assets/interface-star-no.svg"
+          src="@/assets/interface-star-no.svg"
           :alt="`Vote ${starNum} out of 5 in this category.`"
         />
       </button>

@@ -20,20 +20,19 @@ router = APIRouter()
 
 
 @router.get("/me", dependencies=[Depends(require_login)])
-def view_my_submission(session_info=Depends(session)):
-    week = compo.get_week(True)
-    votes = week['votes']
+def get_votes(session_info=Depends(session)):
+    votes = compo.get_week(False)['votes']
     for vote in votes:
         if vote['userID'] == session_info["user_id"]:
-            return vote
+            return vote['ratings']
 
-    return {}
+    return []
 
 
 @router.put("/me", dependencies=[Depends(require_login)])
-def update_my_submission(session_info=Depends(session)):
+def vote(session_info=Depends(session)):
     raise NotImplementedError()
-    week = compo.get_week(True)
+    week = compo.get_week(False)
     week['votes'] = [
         vote
         for vote in week['votes']

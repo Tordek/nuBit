@@ -14,9 +14,9 @@
       <table class="table is-hoverable">
         <thead>
           <tr>
+            <th>View &amp; Listen</th>
             <th>Entrant</th>
             <th>Composition Title</th>
-            <th>View &amp; Listen</th>
             <th>Download</th>
             <th v-for="voteParam in weekData.voteParams" :key="voteParam.name">
               {{ voteParam.description }}
@@ -28,23 +28,22 @@
             v-for="(entry, entryIndex) in weekData.entries"
             :key="entryIndex"
             :class="{ 'is-selected': viewedEntryIndex == entryIndex }"
+            @click="viewEntry(entryIndex)"
           >
+            <td>
+                <img src="@/assets/interface-video-play.png" alt="Play" />
+            </td>
             <td>{{ entry.entrantName }}</td>
             <td>{{ entry.entryName }}</td>
-            <td>
-              <button class="icon-button" @click="viewEntry(entryIndex)">
-                <img src="/static/interface-video-play.png" alt="Play" />
-              </button>
-            </td>
             <td>
               <a :href="entry.mp3Url" target="_blank">MP3</a>
               <a :href="entry.pdfUrl" target="_blank">PDF</a>
             </td>
             <td v-for="voteParam in weekData.voteParams" :key="voteParam.name">
               <VotingWidget
-                v-if="user"
                 :paramData="voteParam"
                 :disabled="!weekData.votingOpen"
+                v-if="voteData !== null"
                 v-model="voteData[entry.uuid][voteParam.name]"
               />
             </td>
@@ -77,7 +76,7 @@
     >
       <div v-if="viewedEntryIndex === null">
         <div id="pdf-alt" class="pdf-alt">
-          <img src="/static/kirb_phones.png" />
+          <img src="@/assets/kirb_phones.png" />
           <h2>
             Welcome!<br />Select one of the entries on the left to view its
             score.
@@ -95,22 +94,22 @@
     <div>
       <div width="48px" class="viewer-control">
         <button class="icon-button" @click="toggleEntryContainer()">
-          <img src="/static/interface-category-grid.png" />
+          <img src="@/assets/interface-category-grid.png" />
         </button>
       </div>
       <div width="48px" class="viewer-control">
         <button class="icon-button" @click="selectAdjacentEntry(-1)">
-          <img src="/static/interface-up-arrow.png" />
+          <img src="@/assets/interface-up-arrow.png" />
         </button>
       </div>
       <div width="48px" class="viewer-control">
         <button class="icon-button" @click="selectAdjacentEntry(1)">
-          <img src="/static/interface-down-arrow.png" />
+          <img src="@/assets/interface-down-arrow.png" />
         </button>
       </div>
       <div width="48px" class="viewer-control">
         <button class="icon-button" @click="toggleNightMode()">
-          <img src="/static/interface-bulb.png" />
+          <img src="@/assets/interface-bulb.png" />
         </button>
       </div>
     </div>
@@ -128,14 +127,15 @@ export default Vue.extend({
   components: { EntryDetail, VotingWidget },
   props: {
     user: Object as PropType<UserData>,
-    weekData: Object as PropType<WeekData>
+    weekData: Object as PropType<WeekData>,
+    initialVoteData: Object as PropType<VoteData>
   },
   data() {
     return {
       showEntryList: true,
       pdfColorInvert: false,
       viewedEntryIndex: null as number | null,
-      voteData: null as VoteData | null,
+      voteData: this.initialVoteData,
       working: false
     };
   },

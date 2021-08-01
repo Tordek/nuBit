@@ -14,7 +14,7 @@ export type WeekData = {
 export type VoteParam = {
     name: VoteParamName;
     description: string;
-    helpTipDefs: Record<number, string>;
+    helpTips: Record<number, string>;
 }
 
 export type Entry = {

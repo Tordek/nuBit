@@ -184,7 +184,7 @@ def entry_valid(entry: dict) -> bool:
         "entryName",
         "entrantName",
     ]
-    
+
     if any(entry[requirement] is None for requirement in requirements):
         return False
 

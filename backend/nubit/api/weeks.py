@@ -45,6 +45,7 @@ def format_week(week: dict, is_admin: bool) -> dict:
     """
     entryData = None
 
+    week["submissionsOpen"] = False
     if is_admin or not week["submissionsOpen"]:
         entryData = []
         for e in week["entries"]:
