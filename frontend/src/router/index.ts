@@ -2,7 +2,8 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Layout from '../components/Layout.vue'
 import Home from '../pages/Home.vue'
-import Vote from '../pages/Vote.vue'
+import Week from '../pages/Week.vue'
+import ErrorPage from '../pages/ErrorPage.vue'
 import Submit from '../pages/Submit.vue'
 import OauthDiscord from '../pages/DiscordOauth.vue'
 
@@ -17,14 +18,14 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     component: Layout,
-    children: [      
+    children: [
       {
         path: '',
         component: Home
       },
       {
-        path: 'vote',
-        component: Vote
+        path: 'week/:which',
+        component: Week
       },
       {
         path: 'submit',
@@ -32,6 +33,10 @@ const routes: Array<RouteConfig> = [
       },
     ]
   },
+  {
+    path: '*',
+    component: ErrorPage
+  }
 ]
 
 const router = new VueRouter({

@@ -24,6 +24,7 @@ def get_current_week():
 @router.put("/current", dependencies=[Depends(require_admin)])
 def update_current_week():
     week = compo.get_week(True)
+    raise NotImplementedError()
 
 
 @router.get("/next")
@@ -34,6 +35,7 @@ def get_current_week():
 @router.put("/next", dependencies=[Depends(require_admin)])
 def update_current_week():
     week = compo.get_week(False)
+    raise NotImplementedError()
 
 
 # Helpers

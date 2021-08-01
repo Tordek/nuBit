@@ -33,7 +33,9 @@ Backend settings:
 - `TIMEZONE_OFFSET=` - Timezone delta between the server and the display.
 - `POSTENTRIES_CHANNEL=` - If defined, the !postentries command will only work
     here, since it generates a lot of spam.
-
+- `VALID_HOSTS=` - Space-separated list of acceptable domain prefix for
+    submissions.
+    
 Running
 -------
 

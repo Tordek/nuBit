@@ -17,15 +17,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import getUserData, { UserDataResponse } from "@/services/getUserData";
+import getUserData from "@/services/getUserData";
 import getAuthUrl from "@/services/getAuthUrl";
 import { PropType } from "vue/types/options";
+import { UserData } from "@/types";
 
 const APP_URL = process.env["VUE_APP_APP_URL"];
 
 export default Vue.extend({
   props: {    
-      user: Object as PropType<UserDataResponse>
+      user: Object as PropType<UserData>
   },
   data() {
     return {

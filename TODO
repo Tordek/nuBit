@@ -2,14 +2,14 @@
 [x] With ^, remove VUE_APP_OAUTH_URL and generate it server-side
 [x] Handle OAuth errors
 [ ] View submissions - Not logged in
-[ ] Submit
+[X] Submit
 [ ] Vote
 [ ] View status for own submissions
-[x] Make the Discord bot part... exist.
+[X] Make the Discord bot part... exist.
 [ ] Provide an installing script:
     [ ] `nginx.conf` - See Vue's docs: needs to serve static files if found, then `api` from backend, then anything else points to the `vue` root at index.html
     [ ] `nuBit.service`
     [ ] `npm run build && cp -R build ../backend/`
 [ ] Style
 [ ] Make `status` and `ranking` show links to the website
-[x] Check if is_admin
+[X] Check if is_admin

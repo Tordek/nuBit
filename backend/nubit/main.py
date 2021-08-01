@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 import asyncio
 from nubit import bot
-from nubit.api import auth, weeks, entries, votes
+from nubit.api import auth, weeks, entries, votes, hosts
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
@@ -40,5 +40,6 @@ api_router.include_router(auth.router, prefix="/auth")
 api_router.include_router(weeks.router, prefix="/weeks")
 api_router.include_router(entries.router, prefix="/entries")
 api_router.include_router(votes.router, prefix="/votes")
+api_router.include_router(hosts.router, prefix="/hosts")
 
 app.include_router(api_router, prefix="/api")

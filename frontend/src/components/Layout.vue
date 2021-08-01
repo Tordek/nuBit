@@ -24,25 +24,25 @@
       </div>
     </nav>
     <section class="section">
-      <RouterView />
+      <RouterView :user="user" />
     </section>
   </div>
 </template>
 
 <script lang="ts">
 import UserInformation from "@/components/UserInformation.vue";
+import { UserData } from "@/types";
 import Vue from "vue";
-import { UserDataResponse } from '@/services/getUserData';
 
 export default Vue.extend({
   components: { UserInformation },
   data() {
     return {
-      user: null as UserDataResponse | null
+      user: null as UserData | null
     };
   },
   methods: {
-    setUser(user: UserDataResponse) {
+    setUser(user: UserData) {
       this.user = user;
     }
   }

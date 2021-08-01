@@ -32,6 +32,7 @@ def view_my_submission(session_info=Depends(session)):
 
 @router.put("/me", dependencies=[Depends(require_login)])
 def update_my_submission(session_info=Depends(session)):
+    raise NotImplementedError()
     week = compo.get_week(True)
     week['votes'] = [
         vote

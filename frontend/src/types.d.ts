@@ -1,3 +1,6 @@
+export type EntryId = string & { readonly __tag: unique symbol };
+export type VoteParamName = string & { readonly __tag: unique symbol };
+
 export type WeekData = {
     votingOpen: boolean;
     submissionOpen: boolean;
@@ -8,13 +11,13 @@ export type WeekData = {
 };
 
 export type VoteParam = {
-    name: string;
+    name: VoteParamName;
     description: string;
     helpTipDefs: Record<number, string>;
 }
 
 export type Entry = {
-    uuid: string;
+    uuid: EntryId;
     entrantName: string;
     entryName: string;
     pdfUrl: string;
@@ -28,3 +31,11 @@ export type Entry = {
 export type AuthenticatedQuery = {
     userstringey: string
 }
+
+export type UserData = {
+    user_id: string,
+    username: string,
+    avatar: string,
+};
+
+export type VoteData = Record<EntryId, Record<VoteParamName, number | null>>;

@@ -1,8 +1,6 @@
-export type UserDataResponse = {
-    user_id: string,
-    username: string,
-    avatar: string,
-};
+import { UserData } from "@/types";
+
+export type UserDataResponse = UserData;
 
 const VUE_APP_API_URL = process.env['VUE_APP_API_URL']
 

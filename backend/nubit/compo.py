@@ -148,7 +148,13 @@ def create_blank_entry(entrant_name: str,
         "entryName": "",
         "entrantName": entrant_name,
         "discordID": discord_id,
-        "uuid": str(uuid.uuid4())
+        "uuid": str(uuid.uuid4()),
+        "pdfFormat": None,
+        "pdfFilename": None,
+        "pdf": None,
+        "mp3Format": None,
+        "mp3Filename": None,
+        "mp3": None,
     }
 
 
@@ -160,9 +166,9 @@ def find_entry_by_uuid(uuid: str) -> Optional[dict]:
     return None
 
 
-def find_entry_by_user(week: dict, user: dict) -> Optional[dict]:
+def find_entry_by_user(week: dict, user_id: str) -> Optional[dict]:
     for entry in week["entries"]:
-        if entry["discordID"] == user.user_id:
+        if entry["discordID"] == user_id:
             return entry
     return None
 
@@ -178,14 +184,9 @@ def entry_valid(entry: dict) -> bool:
         "entryName",
         "entrantName",
     ]
-
-    for requirement in requirements:
-        if requirement not in entry:
-            return False
-
-    for param in ["mp3", "pdf"]:
-        if entry[param] is None:
-            return False
+    
+    if any(entry[requirement] is None for requirement in requirements):
+        return False
 
     return True
 

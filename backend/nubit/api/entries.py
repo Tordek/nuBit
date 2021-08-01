@@ -1,4 +1,7 @@
+from typing import Any, Optional
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.datastructures import UploadFile
+from fastapi.param_functions import File, Form
 from nubit import bot
 from nubit import compo
 from nubit.helpers import require_login, session
@@ -10,25 +13,77 @@ router = APIRouter()
 @router.get("/me", dependencies=[Depends(require_login)])
 def view_my_submission(session_info=Depends(session)):
     week = compo.get_week(True)
-    if not week["submissionsOpen"]:
+    entry = compo.find_entry_by_user(week, session_info["user_id"])
+
+    if entry is None:
         raise HTTPException(
-            status_code=401, detail="Submissions are currently closed")
+            status_code=404, detail="You haven't submitted anything")
 
-    entry = get_editable_entry(
-        compo.find_entry_by_user(week, session_info["user_id"]))
-
-    return entry
+    return get_editable_entry(entry)
 
 
 @router.delete("/me", dependencies=[Depends(require_login)])
 def delete_my_submission(session_info=Depends(session)):
+    raise NotImplementedError()
+    week = compo.get_week(True)
+    if not week["submissionsOpen"]:
+        raise HTTPException(
+            status_code=401, detail="Submissions are currently closed")
+
+    entry = compo.find_entry_by_user(week, session_info["user_id"])
+
+    if entry is None:
+        raise HTTPException(
+            status_code=404, detail="You haven't submitted anything")
+
     pass
 
 
 @router.put("/me", dependencies=[Depends(require_login)])
-def delete_my_submission(session_info=Depends(session)):
-    bot.entry_info_message({})
-    pass
+async def update_my_submission(
+    session_info=Depends(session),
+    name: str = Form(...),
+    pdfFile: Optional[UploadFile] = File(None),
+    mp3File: Optional[UploadFile] = File(None),
+    mp3Link: Optional[str] = Form(None),
+):
+    week = compo.get_week(True)
+    if not week["submissionsOpen"]:
+        raise HTTPException(
+            status_code=401, detail="Submissions are currently closed")
+
+    entry = compo.find_entry_by_user(week, session_info["user_id"])
+
+    if entry is None:
+        entry = compo.create_blank_entry(
+            session_info["username"],
+            session_info["user_id"]
+        )
+        week["entries"].append(entry)
+
+    entry["entryName"] = name
+    if pdfFile is not None:
+        entry["pdfFormat"] = "pdf"
+        entry["pdfFilename"] = pdfFile.filename
+        entry["pdf"] = await pdfFile.read()
+
+    if mp3File is not None:
+        entry["mp3Format"] = "mp3"
+        entry["mp3Filename"] = mp3File.filename
+        entry["mp3"] = await mp3File.read()
+
+    if mp3Link is not None:
+        entry["mp3Format"] = "external"
+        entry["mp3Filename"] = None
+        entry["mp3"] = mp3Link
+
+    bot.entry_info_message(entry)
+    return get_editable_entry(entry)
+
+
+@router.put("/me", dependencies=[Depends(require_login)])
+async def update_my_submission():
+    raise NotImplementedError()
 
 
 # Helpers
