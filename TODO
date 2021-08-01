@@ -3,7 +3,7 @@
 [x] Handle OAuth errors
 [X] View submissions - Not logged in
 [X] Submit
-[ ] Vote
+[X] Vote
 [x] View status for own submission
 [ ] View more status for own submission
 [X] Make the Discord bot part... exist.
